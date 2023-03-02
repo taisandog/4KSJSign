@@ -4,6 +4,12 @@
 
 使用本签到助手可以方便进行每天签到
 
+### 安装运行库
+
+https://dotnet.microsoft.com/en-us/download/dotnet/6.0
+
+进入网站下载安装 **.NET Desktop Runtime 6.0.14**
+
 ### 配置
 用文本编辑器打开 **\App_Data\user.xml** 配置XML，
 每一行user标签为一个用户，name标签是用户名，pwd标签是密码
