@@ -11,9 +11,13 @@ https://dotnet.microsoft.com/en-us/download/dotnet/6.0
 进入网站下载安装 **.NET Desktop Runtime 6.0.14**
 
 ### 配置
-用文本编辑器打开 **\App_Data\user.xml** 配置XML，
-每一行user标签为一个用户，name标签是用户名，pwd标签是密码
-*填入的内容如包含特殊字符则需要进行htmlencode*
+
+用文本编辑器打开 **\App_Data\user.xml** 配置XML
+
+每一行**user**标签为一个用户，**name**属性是用户名，**pwd**属性是密码
+
+**填入的内容如包含特殊字符则需要进行htmlencode**
+
 ***htmlencode网站：https://tool.chinaz.com/tools/htmlencode.aspx***
 
 ### 使用
