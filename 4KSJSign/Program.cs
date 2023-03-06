@@ -2,7 +2,7 @@ namespace _4KSJSign
 {
     internal static class Program
     {
-        public const string Version = "1.1";
+
 
         public static bool IsAuto = false;
 

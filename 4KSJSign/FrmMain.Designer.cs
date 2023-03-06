@@ -40,9 +40,9 @@
             this.nudHour = new System.Windows.Forms.NumericUpDown();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.mbDisplay = new Library.MessageBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.wbMain = new CefSharp.WinForms.ChromiumWebBrowser();
-            this.mbDisplay = new Library.MessageBox();
             this.groupBox1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudMinute)).BeginInit();
@@ -171,6 +171,18 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "日志";
             // 
+            // mbDisplay
+            // 
+            this.mbDisplay.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mbDisplay.Font = new System.Drawing.Font("宋体", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.mbDisplay.Location = new System.Drawing.Point(3, 19);
+            this.mbDisplay.Name = "mbDisplay";
+            this.mbDisplay.ShowError = true;
+            this.mbDisplay.ShowLog = true;
+            this.mbDisplay.ShowWarning = true;
+            this.mbDisplay.Size = new System.Drawing.Size(794, 130);
+            this.mbDisplay.TabIndex = 0;
+            // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.wbMain);
@@ -191,18 +203,6 @@
             this.wbMain.TabIndex = 0;
             this.wbMain.Text = "wbMain";
             // 
-            // mbDisplay
-            // 
-            this.mbDisplay.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mbDisplay.Font = new System.Drawing.Font("宋体", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.mbDisplay.Location = new System.Drawing.Point(3, 19);
-            this.mbDisplay.Name = "mbDisplay";
-            this.mbDisplay.ShowError = true;
-            this.mbDisplay.ShowLog = true;
-            this.mbDisplay.ShowWarning = true;
-            this.mbDisplay.Size = new System.Drawing.Size(794, 130);
-            this.mbDisplay.TabIndex = 0;
-            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -213,7 +213,7 @@
             this.Controls.Add(this.groupBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FrmMain";
-            this.Text = "4K世界签到";
+            this.Text = "4K世界签到助手";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
             this.Load += new System.EventHandler(this.FrmMain_Load);
             this.Shown += new System.EventHandler(this.FrmMain_Shown);

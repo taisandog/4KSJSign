@@ -251,8 +251,28 @@ namespace _4KSJSign
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
-            this.Text = String.Format("4K世界签到助手:[v{0}]", Program.Version);
-            _regConfig = new RegConfig(Application.StartupPath + "\\4KSJSign.exe -auto", "4KSJSign");
+            Version? ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            if (ver != null) 
+            {
+                this.Text = String.Format("4K世界签到助手:[v{0}]", ver.ToString());
+            }
+
+            string path = Application.StartupPath.TrimEnd('\\');
+            bool hasSpace = path.Contains(' ');
+
+            StringBuilder sbRoot = new StringBuilder();
+            if (hasSpace)
+            {
+                sbRoot.Append("\"");
+            }
+            sbRoot.Append(path);
+            sbRoot.Append("\\4KSJSign.exe");
+            if (hasSpace)
+            {
+                sbRoot.Append("\"");
+            }
+            sbRoot.Append(" -auto");
+            _regConfig = new RegConfig(sbRoot.ToString(), "4KSJSign");
             chkAutoRun.Checked = _regConfig.IsAutoRun;
             _lstUser = UserInfo.LoadConfig();
 
