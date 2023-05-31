@@ -4,6 +4,7 @@ using CefSharp;
 using CefSharp.WinForms;
 using HtmlAgilityPack;
 using Sign.Unit;
+using System.Security.Policy;
 using System.Text;
 
 namespace _4KSJSign
@@ -56,7 +57,9 @@ namespace _4KSJSign
         {
             DateTime dtLast = DateTime.MinValue;
             DateTime now = DateTime.MinValue;
-            string hash = null;
+            DateTime dtRndLast = DateTime.MinValue;//最后随机时间
+            int tick = 10000;
+            DateTime dtTick= DateTime.MinValue;
             int hour=(int)nudHour.Value;
             int minute=(int)nudMinute.Value;
             while (_running) 
@@ -64,44 +67,18 @@ namespace _4KSJSign
                 try
                 {
                     now = DateTime.Now;
-                    if (now.Hour != hour)
+                    if (now.Subtract(dtLast).TotalMilliseconds < 10000)
                     {
                         continue;
                     }
-                    if (now.Subtract(dtLast).TotalHours<20) 
+                    if (DoSign(now, dtLast, hour, minute)) 
                     {
-                        continue;
-                    }
-                    if(now.Minute< minute || now.Minute > minute + 5) 
-                    {
-                        continue;
-                    }
-                    
-                    try
-                    {
-                        mbDisplay.Log("开始签到");
-                        foreach (UserInfo info in _lstUser)
-                        {
-                            mbDisplay.Log(info.Name+"开始签到");
-                            if (!DoLogin(info.Name, info.Password))
-                            {
-                                mbDisplay.Log(info.Name + " 登录失败");
-                                continue;
-                            }
-                            CheckVisted(out hash);
-                            Loginout(hash);
-                            mbDisplay.Log(info.Name+" 签到完毕");
-                            while (wbMain.GetBrowser().IsLoading) 
-                            {
-                                Thread.Sleep(200);
-                            }
-                            Cef.GetGlobalCookieManager().DeleteCookies("", "");
-                        }
                         dtLast = now;
                     }
-                    catch (Exception ex)
+                    if (DoRandomTime(now, dtRndLast,ref hour,ref minute))
                     {
-                        mbDisplay.LogError(ex.ToString());
+                        dtRndLast = now;
+
                     }
                 }
                 finally
@@ -111,6 +88,91 @@ namespace _4KSJSign
             }
         }
 
+        /// <summary>
+        /// 判断签到
+        /// </summary>
+        /// <param name="now">当前时间</param>
+        /// <param name="dtLast">最后签到时间</param>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        private bool DoSign(DateTime now, DateTime dtLast, int hour, int minute)
+        {
+            if (now.Hour != hour)
+            {
+                return false;
+            }
+            if (now.Subtract(dtLast).TotalHours < 20)
+            {
+                return false;
+            }
+            if (now.Minute < minute || now.Minute > minute + 5)
+            {
+                return false;
+            }
+            string hash = null;
+            mbDisplay.Log("开始全部签到");
+            try
+            {
+                
+                foreach (UserInfo info in _lstUser)
+                {
+                    mbDisplay.Log(info.Name + "开始签到");
+                    if (!DoLogin(info.Name, info.Password))
+                    {
+                        mbDisplay.Log(info.Name + " 登录失败");
+                        continue;
+                    }
+                    CheckVisted(out hash);
+                    Loginout(hash);
+                    mbDisplay.Log(info.Name + " 签到完毕");
+                    while (wbMain.GetBrowser().IsLoading)
+                    {
+                        Thread.Sleep(200);
+                    }
+                    Cef.GetGlobalCookieManager().DeleteCookies("", "");
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                mbDisplay.LogError(ex.ToString());
+            }
+            return true;
+        }
+        /// <summary>
+        /// 重新随机时间
+        /// </summary>
+        private bool DoRandomTime(DateTime now, DateTime dtRndLast, ref int hour,ref int mintue)
+        {
+            if (now.Hour != 0) 
+            {
+                return false;
+            }
+            if (now.Minute >10)
+            {
+                return false;
+            }
+            if (now.Subtract(dtRndLast).TotalHours < 20)
+            {
+                return false;
+            }
+            Random rnd = new Random((int)DateTime.Now.Ticks);
+
+            int chour = rnd.Next(10, 23);
+            int cmintue = rnd.Next(0, 60);
+            hour = chour;
+            mintue = cmintue;
+            this.Invoke(new Action(() =>
+            {
+                nudHour.Value = chour;
+                nudMinute.Value = cmintue;
+                
+            }));
+            _setting.Hour = chour;
+            _setting.Minute = cmintue;
+            _setting.SaveConfig();
+            return true;
+        }
         private void EnableStart(bool isEnable) 
         {
 
@@ -199,6 +261,8 @@ namespace _4KSJSign
             }
             return null;
         }
+
+       
 
         /// <summary>
         /// 加载Url
