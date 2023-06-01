@@ -78,7 +78,7 @@ namespace _4KSJSign
                     if (DoRandomTime(now, dtRndLast,ref hour,ref minute))
                     {
                         dtRndLast = now;
-
+                        dtLast = DateTime.MinValue;
                     }
                 }
                 finally
