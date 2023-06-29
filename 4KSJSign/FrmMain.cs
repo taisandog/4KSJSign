@@ -6,6 +6,7 @@ using HtmlAgilityPack;
 using Sign.Unit;
 using System.Security.Policy;
 using System.Text;
+using System.Web;
 
 namespace _4KSJSign
 {
@@ -131,7 +132,7 @@ namespace _4KSJSign
                     }
                     Cef.GetGlobalCookieManager().DeleteCookies("", "");
                 }
-               
+                LoadUrlHtml("about:blank");
             }
             catch (Exception ex)
             {
@@ -207,27 +208,41 @@ namespace _4KSJSign
             {
                 return;
             }
-            HtmlNode node = FindHash(doc);
-            if (node == null) 
+            //HtmlNode node = FindHash(doc);
+            //if (node == null) 
+            //{
+            //    mbDisplay.LogError("找不到哈希值");
+            //    return;
+            //}
+            HtmlNode node = FindSignLink(doc);
+            if (node == null)
             {
-                mbDisplay.LogError("找不到哈希值");
+                mbDisplay.LogError("找不到签到地址");
                 return;
             }
             if (!_running)
             {
                 return;
             }
-            hash = node.GetAttributeValue("value","");
-            if (string.IsNullOrWhiteSpace(hash)) 
+
+            //hash = node.GetAttributeValue("value","");
+            //if (string.IsNullOrWhiteSpace(hash)) 
+            //{
+            //    mbDisplay.LogError("找不到哈希值");
+            //    return;
+            //}
+            //if (!_running)
+            //{
+            //    return;
+            //}
+
+            string url = node.GetAttributeValue("href", "");
+            if (string.IsNullOrWhiteSpace(url)) 
             {
-                mbDisplay.LogError("找不到哈希值");
-                return;
+                mbDisplay.LogError("找不到签到地址");
             }
-            if (!_running)
-            {
-                return;
-            }
-            string url = string.Format("https://www.4ksj.com/qiandao/?mod=sign&operation=qiandao&formhash={0}&format=empty", hash);
+            //string url = string.Format("https://www.4ksj.com/qiandao/?mod=sign&operation=qiandao&formhash={0}&format=empty", hash);
+            url = "https://www.4ksj.com/" + HttpUtility.HtmlDecode(url);
             html = LoadUrlHtml(url);
             
 
@@ -262,7 +277,22 @@ namespace _4KSJSign
             return null;
         }
 
-       
+        private HtmlNode FindSignLink(HtmlAgilityPack.HtmlDocument doc)
+        {
+            string text = null;
+            foreach (HtmlNode node in doc.DocumentNode.Descendants("a"))
+            {
+               
+                text = node.GetAttributeValue("id", "");
+                if (!string.Equals(text, "JD_sign", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    continue;
+                }
+               
+                return node;
+            }
+            return null;
+        }
 
         /// <summary>
         /// 加载Url
