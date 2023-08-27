@@ -29,203 +29,206 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.chkAutoRun = new System.Windows.Forms.CheckBox();
-            this.nudMinute = new System.Windows.Forms.NumericUpDown();
-            this.label2 = new System.Windows.Forms.Label();
-            this.btnStop = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.btnStart = new System.Windows.Forms.Button();
-            this.nudHour = new System.Windows.Forms.NumericUpDown();
-            this.button1 = new System.Windows.Forms.Button();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.mbDisplay = new Library.MessageBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.wbMain = new CefSharp.WinForms.ChromiumWebBrowser();
-            this.groupBox1.SuspendLayout();
-            this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMinute)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudHour)).BeginInit();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.SuspendLayout();
+            groupBox1 = new GroupBox();
+            panel1 = new Panel();
+            chkAutoRun = new CheckBox();
+            nudMinute = new NumericUpDown();
+            label2 = new Label();
+            btnStop = new Button();
+            label1 = new Label();
+            btnStart = new Button();
+            nudHour = new NumericUpDown();
+            button1 = new Button();
+            groupBox2 = new GroupBox();
+            mbDisplay = new Library.MessageBox();
+            groupBox3 = new GroupBox();
+            wbMain = new CefSharp.WinForms.ChromiumWebBrowser();
+            btnVerCode = new Button();
+            groupBox1.SuspendLayout();
+            panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudMinute).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudHour).BeginInit();
+            groupBox2.SuspendLayout();
+            groupBox3.SuspendLayout();
+            SuspendLayout();
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.panel1);
-            this.groupBox1.Controls.Add(this.button1);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox1.Location = new System.Drawing.Point(0, 0);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(800, 57);
-            this.groupBox1.TabIndex = 0;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "操作";
+            groupBox1.Controls.Add(btnVerCode);
+            groupBox1.Controls.Add(panel1);
+            groupBox1.Controls.Add(button1);
+            groupBox1.Dock = DockStyle.Top;
+            groupBox1.Location = new Point(0, 0);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(800, 57);
+            groupBox1.TabIndex = 0;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "操作";
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.chkAutoRun);
-            this.panel1.Controls.Add(this.nudMinute);
-            this.panel1.Controls.Add(this.label2);
-            this.panel1.Controls.Add(this.btnStop);
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.btnStart);
-            this.panel1.Controls.Add(this.nudHour);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(325, 19);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(472, 35);
-            this.panel1.TabIndex = 5;
+            panel1.Controls.Add(chkAutoRun);
+            panel1.Controls.Add(nudMinute);
+            panel1.Controls.Add(label2);
+            panel1.Controls.Add(btnStop);
+            panel1.Controls.Add(label1);
+            panel1.Controls.Add(btnStart);
+            panel1.Controls.Add(nudHour);
+            panel1.Dock = DockStyle.Right;
+            panel1.Location = new Point(314, 19);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(483, 35);
+            panel1.TabIndex = 5;
             // 
             // chkAutoRun
             // 
-            this.chkAutoRun.AutoSize = true;
-            this.chkAutoRun.Location = new System.Drawing.Point(3, 9);
-            this.chkAutoRun.Name = "chkAutoRun";
-            this.chkAutoRun.Size = new System.Drawing.Size(75, 21);
-            this.chkAutoRun.TabIndex = 7;
-            this.chkAutoRun.Text = "开机启动";
-            this.chkAutoRun.UseVisualStyleBackColor = true;
+            chkAutoRun.AutoSize = true;
+            chkAutoRun.Location = new Point(3, 9);
+            chkAutoRun.Name = "chkAutoRun";
+            chkAutoRun.Size = new Size(75, 21);
+            chkAutoRun.TabIndex = 7;
+            chkAutoRun.Text = "开机启动";
+            chkAutoRun.UseVisualStyleBackColor = true;
             // 
             // nudMinute
             // 
-            this.nudMinute.Location = new System.Drawing.Point(250, 7);
-            this.nudMinute.Maximum = new decimal(new int[] {
-            59,
-            0,
-            0,
-            0});
-            this.nudMinute.Name = "nudMinute";
-            this.nudMinute.Size = new System.Drawing.Size(46, 23);
-            this.nudMinute.TabIndex = 6;
+            nudMinute.Location = new Point(250, 7);
+            nudMinute.Maximum = new decimal(new int[] { 59, 0, 0, 0 });
+            nudMinute.Name = "nudMinute";
+            nudMinute.Size = new Size(46, 23);
+            nudMinute.TabIndex = 6;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(233, 10);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(11, 17);
-            this.label2.TabIndex = 5;
-            this.label2.Text = ":";
+            label2.AutoSize = true;
+            label2.Location = new Point(233, 10);
+            label2.Name = "label2";
+            label2.Size = new Size(11, 17);
+            label2.TabIndex = 5;
+            label2.Text = ":";
             // 
             // btnStop
             // 
-            this.btnStop.Location = new System.Drawing.Point(393, 3);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(75, 29);
-            this.btnStop.TabIndex = 2;
-            this.btnStop.Text = "停止";
-            this.btnStop.UseVisualStyleBackColor = true;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            btnStop.Location = new Point(393, 3);
+            btnStop.Name = "btnStop";
+            btnStop.Size = new Size(75, 29);
+            btnStop.TabIndex = 2;
+            btnStop.Text = "停止";
+            btnStop.UseVisualStyleBackColor = true;
+            btnStop.Click += btnStop_Click;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(117, 10);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(59, 17);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "启动时间:";
+            label1.AutoSize = true;
+            label1.Location = new Point(117, 10);
+            label1.Name = "label1";
+            label1.Size = new Size(59, 17);
+            label1.TabIndex = 4;
+            label1.Text = "启动时间:";
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(306, 3);
-            this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(81, 29);
-            this.btnStart.TabIndex = 0;
-            this.btnStart.Text = "开始";
-            this.btnStart.UseVisualStyleBackColor = true;
-            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
+            btnStart.Location = new Point(306, 3);
+            btnStart.Name = "btnStart";
+            btnStart.Size = new Size(81, 29);
+            btnStart.TabIndex = 0;
+            btnStart.Text = "开始";
+            btnStart.UseVisualStyleBackColor = true;
+            btnStart.Click += btnStart_Click;
             // 
             // nudHour
             // 
-            this.nudHour.Location = new System.Drawing.Point(182, 7);
-            this.nudHour.Maximum = new decimal(new int[] {
-            23,
-            0,
-            0,
-            0});
-            this.nudHour.Name = "nudHour";
-            this.nudHour.Size = new System.Drawing.Size(46, 23);
-            this.nudHour.TabIndex = 3;
+            nudHour.Location = new Point(182, 7);
+            nudHour.Maximum = new decimal(new int[] { 23, 0, 0, 0 });
+            nudHour.Name = "nudHour";
+            nudHour.Size = new Size(46, 23);
+            nudHour.TabIndex = 3;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 22);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 26);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "转到首页";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            button1.Location = new Point(12, 22);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 26);
+            button1.TabIndex = 1;
+            button1.Text = "转到首页";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.mbDisplay);
-            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.groupBox2.Location = new System.Drawing.Point(0, 298);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(800, 152);
-            this.groupBox2.TabIndex = 1;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "日志";
+            groupBox2.Controls.Add(mbDisplay);
+            groupBox2.Dock = DockStyle.Bottom;
+            groupBox2.Location = new Point(0, 298);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(800, 152);
+            groupBox2.TabIndex = 1;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "日志";
             // 
             // mbDisplay
             // 
-            this.mbDisplay.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mbDisplay.Font = new System.Drawing.Font("宋体", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.mbDisplay.Location = new System.Drawing.Point(3, 19);
-            this.mbDisplay.Name = "mbDisplay";
-            this.mbDisplay.ShowError = true;
-            this.mbDisplay.ShowLog = true;
-            this.mbDisplay.ShowWarning = true;
-            this.mbDisplay.Size = new System.Drawing.Size(794, 130);
-            this.mbDisplay.TabIndex = 0;
+            mbDisplay.Dock = DockStyle.Fill;
+            mbDisplay.Font = new Font("宋体", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            mbDisplay.Location = new Point(3, 19);
+            mbDisplay.Name = "mbDisplay";
+            mbDisplay.ShowError = true;
+            mbDisplay.ShowLog = true;
+            mbDisplay.ShowWarning = true;
+            mbDisplay.Size = new Size(794, 130);
+            mbDisplay.TabIndex = 0;
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.wbMain);
-            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox3.Location = new System.Drawing.Point(0, 57);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(800, 241);
-            this.groupBox3.TabIndex = 2;
-            this.groupBox3.TabStop = false;
+            groupBox3.Controls.Add(wbMain);
+            groupBox3.Dock = DockStyle.Fill;
+            groupBox3.Location = new Point(0, 57);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(800, 241);
+            groupBox3.TabIndex = 2;
+            groupBox3.TabStop = false;
             // 
             // wbMain
             // 
-            this.wbMain.ActivateBrowserOnCreation = false;
-            this.wbMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.wbMain.Location = new System.Drawing.Point(3, 19);
-            this.wbMain.Name = "wbMain";
-            this.wbMain.Size = new System.Drawing.Size(794, 219);
-            this.wbMain.TabIndex = 0;
-            this.wbMain.Text = "wbMain";
+            wbMain.ActivateBrowserOnCreation = false;
+            wbMain.Dock = DockStyle.Fill;
+            wbMain.Location = new Point(3, 19);
+            wbMain.Name = "wbMain";
+            wbMain.Size = new Size(794, 219);
+            wbMain.TabIndex = 0;
+            wbMain.Text = "wbMain";
+            // 
+            // btnVerCode
+            // 
+            btnVerCode.Location = new Point(93, 22);
+            btnVerCode.Name = "btnVerCode";
+            btnVerCode.Size = new Size(98, 26);
+            btnVerCode.TabIndex = 8;
+            btnVerCode.Text = "手动验证完毕";
+            btnVerCode.UseVisualStyleBackColor = true;
+            btnVerCode.Click += btnVerCode_Click;
             // 
             // FrmMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "FrmMain";
-            this.Text = "4K世界签到助手";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
-            this.Load += new System.EventHandler(this.FrmMain_Load);
-            this.Shown += new System.EventHandler(this.FrmMain_Shown);
-            this.groupBox1.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMinute)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudHour)).EndInit();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 17F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Controls.Add(groupBox3);
+            Controls.Add(groupBox2);
+            Controls.Add(groupBox1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            Name = "FrmMain";
+            Text = "4K世界签到助手";
+            FormClosing += FrmMain_FormClosing;
+            Load += FrmMain_Load;
+            Shown += FrmMain_Shown;
+            groupBox1.ResumeLayout(false);
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudMinute).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudHour).EndInit();
+            groupBox2.ResumeLayout(false);
+            groupBox3.ResumeLayout(false);
+            ResumeLayout(false);
         }
 
         #endregion
@@ -244,5 +247,6 @@
         private NumericUpDown nudMinute;
         private Label label2;
         private CheckBox chkAutoRun;
+        private Button btnVerCode;
     }
 }

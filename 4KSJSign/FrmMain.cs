@@ -1,6 +1,7 @@
 using Buffalo.Kernel;
 using Buffalo.Kernel.TreadPoolManager;
 using CefSharp;
+using CefSharp.DevTools.DOM;
 using CefSharp.WinForms;
 using HtmlAgilityPack;
 using Sign.Unit;
@@ -22,7 +23,7 @@ namespace _4KSJSign
         private bool _running;
 
         private List<UserInfo> _lstUser;
-
+        AutoResetEvent _autoEvent = new AutoResetEvent(false);
         private void btnStart_Click(object sender, EventArgs e)
         {
             _regConfig.IsAutoRun = chkAutoRun.Checked;
@@ -30,11 +31,11 @@ namespace _4KSJSign
             _setting.Minute = (int)nudMinute.Value;
             _setting.SaveConfig();
             StartThread();
-           
+
             EnableStart(false);
         }
 
-        private void StartThread() 
+        private void StartThread()
         {
             StopThread();
             _running = true;
@@ -44,8 +45,9 @@ namespace _4KSJSign
 
         }
 
-        private void StopThread() 
+        private void StopThread()
         {
+            _autoEvent.Set();
             _running = false;
             if (_thd != null)
             {
@@ -54,16 +56,16 @@ namespace _4KSJSign
             _thd = null;
         }
 
-        private void RunMain() 
+        private void RunMain()
         {
             DateTime dtLast = DateTime.MinValue;
             DateTime now = DateTime.MinValue;
             DateTime dtRndLast = DateTime.MinValue;//最后随机时间
             int tick = 10000;
-            DateTime dtTick= DateTime.MinValue;
-            int hour=(int)nudHour.Value;
-            int minute=(int)nudMinute.Value;
-            while (_running) 
+            DateTime dtTick = DateTime.MinValue;
+            int hour = (int)nudHour.Value;
+            int minute = (int)nudMinute.Value;
+            while (_running)
             {
                 try
                 {
@@ -72,11 +74,11 @@ namespace _4KSJSign
                     {
                         continue;
                     }
-                    if (DoSign(now, dtLast, hour, minute)) 
+                    if (DoSign(now, dtLast, hour, minute))
                     {
                         dtLast = now;
                     }
-                    if (DoRandomTime(now, dtRndLast,ref hour,ref minute))
+                    if (DoRandomTime(now, dtRndLast, ref hour, ref minute))
                     {
                         dtRndLast = now;
                         dtLast = DateTime.MinValue;
@@ -112,27 +114,42 @@ namespace _4KSJSign
             }
             string hash = null;
             mbDisplay.Log("开始全部签到");
+            bool isSuccess = false;
             try
             {
-                
+
                 foreach (UserInfo info in _lstUser)
                 {
+
                     mbDisplay.Log(info.Name + "开始签到");
-                    if (!DoLogin(info.Name, info.Password))
+                    isSuccess = DoLogin(info.Name, info.Password, out hash);
+                    if (!isSuccess)
                     {
-                        mbDisplay.Log(info.Name + " 登录失败");
-                        continue;
+                        Loginout(hash);
+                        isSuccess = DoLogin(info.Name, info.Password, out hash);
+                        if (!isSuccess)
+                        {
+                            mbDisplay.Log(info.Name + " 登录失败");
+                            //break;
+                        }
                     }
-                    CheckVisted(out hash);
+                    isSuccess = CheckVisted(out hash);
+                    //if (!isSuccess)
+                    //{
+                    //    break;
+                    //}
                     Loginout(hash);
                     mbDisplay.Log(info.Name + " 签到完毕");
                     while (wbMain.GetBrowser().IsLoading)
                     {
                         Thread.Sleep(200);
                     }
-                    Cef.GetGlobalCookieManager().DeleteCookies("", "");
+                    //Cef.GetGlobalCookieManager().DeleteCookies("", "");
                 }
-                LoadUrlHtml("about:blank");
+                if (isSuccess)
+                {
+                    LoadUrlHtml("about:blank");
+                }
             }
             catch (Exception ex)
             {
@@ -143,13 +160,13 @@ namespace _4KSJSign
         /// <summary>
         /// 重新随机时间
         /// </summary>
-        private bool DoRandomTime(DateTime now, DateTime dtRndLast, ref int hour,ref int mintue)
+        private bool DoRandomTime(DateTime now, DateTime dtRndLast, ref int hour, ref int mintue)
         {
-            if (now.Hour != 0) 
+            if (now.Hour != 0)
             {
                 return false;
             }
-            if (now.Minute >10)
+            if (now.Minute > 10)
             {
                 return false;
             }
@@ -167,14 +184,14 @@ namespace _4KSJSign
             {
                 nudHour.Value = chour;
                 nudMinute.Value = cmintue;
-                
+
             }));
             _setting.Hour = chour;
             _setting.Minute = cmintue;
             _setting.SaveConfig();
             return true;
         }
-        private void EnableStart(bool isEnable) 
+        private void EnableStart(bool isEnable)
         {
 
             btnStart.Enabled = isEnable;
@@ -190,66 +207,90 @@ namespace _4KSJSign
             EnableStart(true);
         }
         //https://www.4ksj.com//qiandao/?mod=sign&operation=qiandao&formhash=43aee397&format=empty
-       
 
-        private void CheckVisted(out string hash) 
+
+        private bool CheckVisted(out string hash)
         {
+            string chkurl = "https://www.4ksj.com/qiandao/";
             hash = null;
-            string html = LoadUrlHtml("https://www.4ksj.com/qiandao/");
+            string html = LoadUrlHtml(chkurl);
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(html);
-            HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes(@"//span[@class='btn btnvisted']");//找到状态
-            if (nodes!=null && nodes.Count > 0)
+            HtmlNode hashNode = FindHash(doc);
+            
+            HtmlNode node = null;//签到按钮标签
+            if (hashNode != null)
             {
-                mbDisplay.Log("已经签到");
-                return;
+                hash = hashNode.GetAttributeValue("value", "");
             }
-            if (!_running) 
+
+
+
+            bool success = false;
+            while (_running && node == null && !success)
             {
-                return;
+                success = LoadVisted(doc, out node);
+                if (!_running)
+                {
+                    return false;
+                }
+
+                if (!success)
+                {
+                    _autoEvent.Reset();
+                    _autoEvent.WaitOne();
+
+                    html = ReadHtml();
+                    doc.LoadHtml(html);
+                }
+
+                
             }
-            //HtmlNode node = FindHash(doc);
-            //if (node == null) 
-            //{
-            //    mbDisplay.LogError("找不到哈希值");
-            //    return;
-            //}
-            HtmlNode node = FindSignLink(doc);
             if (node == null)
             {
-                mbDisplay.LogError("找不到签到地址");
-                return;
+                return success;
             }
             if (!_running)
             {
-                return;
+                return false;
             }
 
-            //hash = node.GetAttributeValue("value","");
-            //if (string.IsNullOrWhiteSpace(hash)) 
-            //{
-            //    mbDisplay.LogError("找不到哈希值");
-            //    return;
-            //}
-            //if (!_running)
-            //{
-            //    return;
-            //}
 
             string url = node.GetAttributeValue("href", "");
-            if (string.IsNullOrWhiteSpace(url)) 
+            if (string.IsNullOrWhiteSpace(url))
             {
                 mbDisplay.LogError("找不到签到地址");
             }
             //string url = string.Format("https://www.4ksj.com/qiandao/?mod=sign&operation=qiandao&formhash={0}&format=empty", hash);
             url = "https://www.4ksj.com/" + HttpUtility.HtmlDecode(url);
             html = LoadUrlHtml(url);
-            
+            return true;
 
-           
         }
 
-        private void Loginout(string hash) 
+        private bool LoadVisted(HtmlAgilityPack.HtmlDocument doc,out HtmlNode signnode)
+        {
+            signnode = null;
+            HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes(@"//span[@class='btn btnvisted']");//找到状态
+            if (nodes != null && nodes.Count > 0)
+            {
+                mbDisplay.Log("已经签到");
+                return true;
+            }
+            signnode = FindSignLink(doc);
+            if (signnode == null)
+            {
+
+                mbDisplay.LogError("找不到签到地址，等待验证");
+
+                return false;
+
+
+            }
+            return true;
+        }
+
+        private void Loginout(string hash)
         {
 
             string url = string.Format("https://www.4ksj.com/member.php?mod=logging&action=logout&formhash={0}", hash);
@@ -257,13 +298,13 @@ namespace _4KSJSign
 
         }
 
-        private HtmlNode FindHash(HtmlAgilityPack.HtmlDocument doc) 
+        private HtmlNode FindHash(HtmlAgilityPack.HtmlDocument doc)
         {
             string text = null;
             foreach (HtmlNode node in doc.DocumentNode.Descendants("input"))
             {
                 text = node.GetAttributeValue("type", "");
-                if (!string.Equals(text,"hidden",StringComparison.CurrentCultureIgnoreCase)) 
+                if (!string.Equals(text, "hidden", StringComparison.CurrentCultureIgnoreCase))
                 {
                     continue;
                 }
@@ -282,18 +323,17 @@ namespace _4KSJSign
             string text = null;
             foreach (HtmlNode node in doc.DocumentNode.Descendants("a"))
             {
-               
+
                 text = node.GetAttributeValue("id", "");
                 if (!string.Equals(text, "JD_sign", StringComparison.CurrentCultureIgnoreCase))
                 {
                     continue;
                 }
-               
+
                 return node;
             }
             return null;
         }
-
         /// <summary>
         /// 加载Url
         /// </summary>
@@ -302,24 +342,34 @@ namespace _4KSJSign
         /// <returns></returns>
         public string LoadUrlHtml(string url)
         {
-            
-            
+            url = url.Trim(' ', '\r', '\n', '/');
+
+
             for (int i = 0; i < 10; i++)
             {
                 wbMain.Load(url);
-                
+
                 for (int j = 0; j < 10; j++)
                 {
-                    if(wbMain.Address == url) 
+                    if (CompareUrl(url, wbMain.Address))
                     {
                         return ReadHtml();
                     }
                     Thread.Sleep(200);
                 }
             }
-            
-            
+
+
             return null;
+        }
+        private bool CompareUrl(string source, string address)
+        {
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                return false;
+            }
+            address = address.Trim(' ', '\r', '\n', '/');
+            return string.Equals(source, address, StringComparison.CurrentCultureIgnoreCase);
         }
         /// <summary>
         /// 读取Html
@@ -332,7 +382,7 @@ namespace _4KSJSign
             bool isLoading = true;
             while (isLoading || string.IsNullOrEmpty(html))
             {
-                
+
                 isLoading = wbMain.IsLoading;
                 if (!isLoading)//等待加载完毕
                 {
@@ -346,7 +396,7 @@ namespace _4KSJSign
         private void FrmMain_Load(object sender, EventArgs e)
         {
             Version? ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            if (ver != null) 
+            if (ver != null)
             {
                 this.Text = String.Format("4K世界签到助手:[v{0}]", ver.ToString());
             }
@@ -372,7 +422,7 @@ namespace _4KSJSign
 
             _setting = ConfigSetting.LoadConfig();
             nudHour.Value = _setting.Hour;
-            nudMinute.Value=_setting.Minute;
+            nudMinute.Value = _setting.Minute;
 
             if (Program.IsAuto)
             {
@@ -387,16 +437,16 @@ namespace _4KSJSign
         private void button1_Click(object sender, EventArgs e)
         {
             LoadUrlHtml("https://www.4ksj.com/");
-            
+
         }
 
         public bool EvaluateJavaScript(string js)
         {
             try
             {
-               
+
                 var response = wbMain.EvaluateScriptAsync(js).Result;
-                if (!response.Success )
+                if (!response.Success)
                 {
                     return false;
                 }
@@ -414,15 +464,30 @@ namespace _4KSJSign
             return true;
         }
 
-        private bool DoLogin(string name,string password) 
+        private bool DoLogin(string name, string password, out string hash)
         {
-            string html=LoadUrlHtml("https://www.4ksj.com/member.php?mod=logging&action=login");
+
+            hash = null;
+            string html = LoadUrlHtml("https://www.4ksj.com");
+            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(html);
+            HtmlNode hashNode = FindHash(doc);
+            if (hashNode != null)
+            {
+                hash = hashNode.GetAttributeValue("value", "");
+            }
+
+            html = LoadUrlHtml("https://www.4ksj.com/member.php?mod=logging&action=login");
+
+
+
+
             Thread.Sleep(500);
-            StringBuilder sbScript=new StringBuilder();
-            sbScript.AppendLine("document.getElementsByName (\"username\")[0].value=\""+name+"\";");
-            sbScript.AppendLine("document.getElementsByName (\"password\")[0].value=\""+password.Replace("\"","\\\"")+"\";");
+            StringBuilder sbScript = new StringBuilder();
+            sbScript.AppendLine("document.getElementsByName (\"username\")[0].value=\"" + name + "\";");
+            sbScript.AppendLine("document.getElementsByName (\"password\")[0].value=\"" + password.Replace("\"", "\\\"") + "\";");
             //sbScript.AppendLine("document.getElementsByName (\"cookietime\")[0].checked=true;");
-            
+
             sbScript.AppendLine("document.getElementsByName (\"loginsubmit\")[0].click();");
             //string script = "$(\"username_LOsCc\").val(\"taisandog\")";
             return EvaluateJavaScript(sbScript.ToString());
@@ -437,6 +502,11 @@ namespace _4KSJSign
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             StopThread();
+        }
+
+        private void btnVerCode_Click(object sender, EventArgs e)
+        {
+            _autoEvent.Set();
         }
     }
 }
