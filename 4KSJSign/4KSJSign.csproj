@@ -9,9 +9,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AssemblyVersion>1.5</AssemblyVersion>
-    <FileVersion>1.5</FileVersion>
+    <AssemblyVersion>1.5.1</AssemblyVersion>
+    <FileVersion>1.5.1</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="app.manifest" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="app.ico" />

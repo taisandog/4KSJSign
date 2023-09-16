@@ -30,8 +30,8 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             groupBox1 = new GroupBox();
+            btnVerCode = new Button();
             panel1 = new Panel();
-            chkAutoRun = new CheckBox();
             nudMinute = new NumericUpDown();
             label2 = new Label();
             btnStop = new Button();
@@ -43,7 +43,6 @@
             mbDisplay = new Library.MessageBox();
             groupBox3 = new GroupBox();
             wbMain = new CefSharp.WinForms.ChromiumWebBrowser();
-            btnVerCode = new Button();
             groupBox1.SuspendLayout();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudMinute).BeginInit();
@@ -65,9 +64,18 @@
             groupBox1.TabStop = false;
             groupBox1.Text = "操作";
             // 
+            // btnVerCode
+            // 
+            btnVerCode.Location = new Point(93, 22);
+            btnVerCode.Name = "btnVerCode";
+            btnVerCode.Size = new Size(83, 26);
+            btnVerCode.TabIndex = 8;
+            btnVerCode.Text = "执行登录";
+            btnVerCode.UseVisualStyleBackColor = true;
+            btnVerCode.Click += btnVerCode_Click;
+            // 
             // panel1
             // 
-            panel1.Controls.Add(chkAutoRun);
             panel1.Controls.Add(nudMinute);
             panel1.Controls.Add(label2);
             panel1.Controls.Add(btnStop);
@@ -75,20 +83,10 @@
             panel1.Controls.Add(btnStart);
             panel1.Controls.Add(nudHour);
             panel1.Dock = DockStyle.Right;
-            panel1.Location = new Point(314, 19);
+            panel1.Location = new Point(320, 19);
             panel1.Name = "panel1";
-            panel1.Size = new Size(483, 35);
+            panel1.Size = new Size(477, 35);
             panel1.TabIndex = 5;
-            // 
-            // chkAutoRun
-            // 
-            chkAutoRun.AutoSize = true;
-            chkAutoRun.Location = new Point(3, 9);
-            chkAutoRun.Name = "chkAutoRun";
-            chkAutoRun.Size = new Size(75, 21);
-            chkAutoRun.TabIndex = 7;
-            chkAutoRun.Text = "开机启动";
-            chkAutoRun.UseVisualStyleBackColor = true;
             // 
             // nudMinute
             // 
@@ -197,16 +195,6 @@
             wbMain.TabIndex = 0;
             wbMain.Text = "wbMain";
             // 
-            // btnVerCode
-            // 
-            btnVerCode.Location = new Point(93, 22);
-            btnVerCode.Name = "btnVerCode";
-            btnVerCode.Size = new Size(98, 26);
-            btnVerCode.TabIndex = 8;
-            btnVerCode.Text = "手动验证完毕";
-            btnVerCode.UseVisualStyleBackColor = true;
-            btnVerCode.Click += btnVerCode_Click;
-            // 
             // FrmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -246,7 +234,6 @@
         private NumericUpDown nudHour;
         private NumericUpDown nudMinute;
         private Label label2;
-        private CheckBox chkAutoRun;
         private Button btnVerCode;
     }
 }

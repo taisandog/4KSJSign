@@ -5,6 +5,7 @@ using CefSharp.DevTools.DOM;
 using CefSharp.WinForms;
 using HtmlAgilityPack;
 using Sign.Unit;
+using System;
 using System.Security.Policy;
 using System.Text;
 using System.Web;
@@ -17,16 +18,17 @@ namespace _4KSJSign
         {
             InitializeComponent();
         }
-        private RegConfig _regConfig;
+        //private RegConfig _regConfig;
         private BlockThread _thd;
         ConfigSetting _setting;
         private bool _running;
 
-        private List<UserInfo> _lstUser;
-        AutoResetEvent _autoEvent = new AutoResetEvent(false);
+        private UserInfo _curUser;
+        //private List<UserInfo> _lstUser;
+        //AutoResetEvent _autoEvent = new AutoResetEvent(false);
         private void btnStart_Click(object sender, EventArgs e)
         {
-            _regConfig.IsAutoRun = chkAutoRun.Checked;
+
             _setting.Hour = (int)nudHour.Value;
             _setting.Minute = (int)nudMinute.Value;
             _setting.SaveConfig();
@@ -47,7 +49,7 @@ namespace _4KSJSign
 
         private void StopThread()
         {
-            _autoEvent.Set();
+            //_autoEvent.Set();
             _running = false;
             if (_thd != null)
             {
@@ -117,39 +119,15 @@ namespace _4KSJSign
             bool isSuccess = false;
             try
             {
+                
+                mbDisplay.Log("开始签到");
 
-                foreach (UserInfo info in _lstUser)
-                {
+                isSuccess = CheckVisted(out hash);
+               
+                mbDisplay.Log(" 签到完毕");
 
-                    mbDisplay.Log(info.Name + "开始签到");
-                    isSuccess = DoLogin(info.Name, info.Password, out hash);
-                    if (!isSuccess)
-                    {
-                        Loginout(hash);
-                        isSuccess = DoLogin(info.Name, info.Password, out hash);
-                        if (!isSuccess)
-                        {
-                            mbDisplay.Log(info.Name + " 登录失败");
-                            //break;
-                        }
-                    }
-                    isSuccess = CheckVisted(out hash);
-                    //if (!isSuccess)
-                    //{
-                    //    break;
-                    //}
-                    Loginout(hash);
-                    mbDisplay.Log(info.Name + " 签到完毕");
-                    while (wbMain.GetBrowser().IsLoading)
-                    {
-                        Thread.Sleep(200);
-                    }
-                    //Cef.GetGlobalCookieManager().DeleteCookies("", "");
-                }
-                if (isSuccess)
-                {
-                    LoadUrlHtml("about:blank");
-                }
+                button1_Click(button1, new EventArgs());
+                
             }
             catch (Exception ex)
             {
@@ -198,7 +176,7 @@ namespace _4KSJSign
             btnStop.Enabled = !isEnable;
             nudHour.Enabled = isEnable;
             nudMinute.Enabled = isEnable;
-            chkAutoRun.Enabled = isEnable;
+            //chkAutoRun.Enabled = isEnable;
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -217,42 +195,17 @@ namespace _4KSJSign
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(html);
             HtmlNode hashNode = FindHash(doc);
-            
+
             HtmlNode node = null;//签到按钮标签
             if (hashNode != null)
             {
                 hash = hashNode.GetAttributeValue("value", "");
             }
 
-
-
-            bool success = false;
-            while (_running && node == null && !success)
-            {
-                success = LoadVisted(doc, out node);
-                if (!_running)
-                {
-                    return false;
-                }
-
-                if (!success)
-                {
-                    _autoEvent.Reset();
-                    _autoEvent.WaitOne();
-
-                    html = ReadHtml();
-                    doc.LoadHtml(html);
-                }
-
-                
-            }
-            if (node == null)
+            bool success = LoadVisted(doc, out node);
+            if (!success)
             {
                 return success;
-            }
-            if (!_running)
-            {
-                return false;
             }
 
 
@@ -268,14 +221,14 @@ namespace _4KSJSign
 
         }
 
-        private bool LoadVisted(HtmlAgilityPack.HtmlDocument doc,out HtmlNode signnode)
+        private bool LoadVisted(HtmlAgilityPack.HtmlDocument doc, out HtmlNode signnode)
         {
             signnode = null;
             HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes(@"//span[@class='btn btnvisted']");//找到状态
             if (nodes != null && nodes.Count > 0)
             {
                 mbDisplay.Log("已经签到");
-                return true;
+                return false;
             }
             signnode = FindSignLink(doc);
             if (signnode == null)
@@ -416,10 +369,17 @@ namespace _4KSJSign
                 sbRoot.Append("\"");
             }
             sbRoot.Append(" -auto");
-            _regConfig = new RegConfig(sbRoot.ToString(), "4KSJSign");
-            chkAutoRun.Checked = _regConfig.IsAutoRun;
-            _lstUser = UserInfo.LoadConfig();
+            //_regConfig = new RegConfig(sbRoot.ToString(), "4KSJSign");
+            //chkAutoRun.Checked = _regConfig.IsAutoRun;
+            List<UserInfo> lstUser = UserInfo.LoadConfig();
+            if (lstUser.Count > 0)
+            {
+                _curUser = lstUser[0];
+                this.Text += "-" + _curUser.Name;
 
+                mbDisplay.Log("已加载用户:" + _curUser.Name);
+
+            }
             _setting = ConfigSetting.LoadConfig();
             nudHour.Value = _setting.Hour;
             nudMinute.Value = _setting.Minute;
@@ -436,8 +396,7 @@ namespace _4KSJSign
 
         private void button1_Click(object sender, EventArgs e)
         {
-            LoadUrlHtml("https://www.4ksj.com/");
-
+            wbMain.Load("https://www.4ksj.com/");
         }
 
         public bool EvaluateJavaScript(string js)
@@ -464,24 +423,10 @@ namespace _4KSJSign
             return true;
         }
 
-        private bool DoLogin(string name, string password, out string hash)
+        private bool DoLogin(string name, string password)
         {
 
-            hash = null;
-            string html = LoadUrlHtml("https://www.4ksj.com");
-            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-            doc.LoadHtml(html);
-            HtmlNode hashNode = FindHash(doc);
-            if (hashNode != null)
-            {
-                hash = hashNode.GetAttributeValue("value", "");
-            }
-
-            html = LoadUrlHtml("https://www.4ksj.com/member.php?mod=logging&action=login");
-
-
-
-
+            LoadUrlHtml("https://www.4ksj.com/member.php?mod=logging&action=login");
             Thread.Sleep(500);
             StringBuilder sbScript = new StringBuilder();
             sbScript.AppendLine("document.getElementsByName (\"username\")[0].value=\"" + name + "\";");
@@ -496,7 +441,7 @@ namespace _4KSJSign
         private void FrmMain_Shown(object sender, EventArgs e)
         {
             //LoadUrlHtml("https://www.4ksj.com/");
-            mbDisplay.Log("已加载用户个数:" + _lstUser.Count);
+
         }
 
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -506,7 +451,16 @@ namespace _4KSJSign
 
         private void btnVerCode_Click(object sender, EventArgs e)
         {
-            _autoEvent.Set();
+            //_autoEvent.Set();
+
+            if (_curUser == null)
+            {
+                mbDisplay.LogError("没有设置预登录，请自己登录");
+                return;
+            }
+            DoLogin(_curUser.Name, _curUser.Password);
+
+
         }
     }
 }
