@@ -189,33 +189,21 @@ namespace _4KSJSign
 
         private bool CheckVisted(out string hash)
         {
-            string chkurl = "https://www.4ksj.com/qiandao/";
+            string chkurl = "https://www.4ksj.com/qiandao.php";
             hash = null;
             string html = LoadUrlHtml(chkurl);
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(html);
-            HtmlNode hashNode = FindHash(doc);
-
+           
             HtmlNode node = null;//签到按钮标签
-            if (hashNode != null)
+           
+            bool needSign = LoadVisted(doc, out node);
+            if (!needSign)
             {
-                hash = hashNode.GetAttributeValue("value", "");
+                return false;
             }
-
-            bool success = LoadVisted(doc, out node);
-            if (!success)
-            {
-                return success;
-            }
-
-
-            string url = node.GetAttributeValue("href", "");
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                mbDisplay.LogError("找不到签到地址");
-            }
-            //string url = string.Format("https://www.4ksj.com/qiandao/?mod=sign&operation=qiandao&formhash={0}&format=empty", hash);
-            url = "https://www.4ksj.com/" + HttpUtility.HtmlDecode(url);
+            string url = "https://www.4ksj.com/"+node.Attributes["href"];
+            //string url = "https://www.4ksj.com/qiandao.php?sign=" + hash;
             html = LoadUrlHtml(url);
             return true;
 
@@ -224,22 +212,19 @@ namespace _4KSJSign
         private bool LoadVisted(HtmlAgilityPack.HtmlDocument doc, out HtmlNode signnode)
         {
             signnode = null;
-            HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes(@"//span[@class='btn btnvisted']");//找到状态
-            if (nodes != null && nodes.Count > 0)
+            HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes(@"//a[@class='btna']");//找到状态
+            if (nodes == null && nodes.Count == 0)
             {
-                mbDisplay.Log("已经签到");
+                mbDisplay.Log("找不到签到按钮");
                 return false;
             }
-            signnode = FindSignLink(doc);
-            if (signnode == null)
+            signnode= nodes[0];
+            if (signnode.InnerText.Contains("今日已打卡")) 
             {
-
-                mbDisplay.LogError("找不到签到地址，等待验证");
-
+                mbDisplay.Log("已签到");
                 return false;
-
-
             }
+
             return true;
         }
 
@@ -251,42 +236,9 @@ namespace _4KSJSign
 
         }
 
-        private HtmlNode FindHash(HtmlAgilityPack.HtmlDocument doc)
-        {
-            string text = null;
-            foreach (HtmlNode node in doc.DocumentNode.Descendants("input"))
-            {
-                text = node.GetAttributeValue("type", "");
-                if (!string.Equals(text, "hidden", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    continue;
-                }
-                text = node.GetAttributeValue("name", "");
-                if (!string.Equals(text, "formhash", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    continue;
-                }
-                return node;
-            }
-            return null;
-        }
+      
 
-        private HtmlNode FindSignLink(HtmlAgilityPack.HtmlDocument doc)
-        {
-            string text = null;
-            foreach (HtmlNode node in doc.DocumentNode.Descendants("a"))
-            {
-
-                text = node.GetAttributeValue("id", "");
-                if (!string.Equals(text, "JD_sign", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    continue;
-                }
-
-                return node;
-            }
-            return null;
-        }
+      
         /// <summary>
         /// 加载Url
         /// </summary>
