@@ -202,7 +202,14 @@ namespace _4KSJSign
             {
                 return false;
             }
-            string url = "https://www.4ksj.com/"+node.Attributes["href"];
+            HtmlAttribute attr = node.Attributes["href"];
+            if (attr == null) 
+            {
+                mbDisplay.Log(" 找不到签到链接");
+
+                return false;
+            }
+            string url = "https://www.4ksj.com/"+ attr.Value;
             //string url = "https://www.4ksj.com/qiandao.php?sign=" + hash;
             html = LoadUrlHtml(url);
             return true;
