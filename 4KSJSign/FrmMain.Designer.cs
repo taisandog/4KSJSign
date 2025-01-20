@@ -30,7 +30,6 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             groupBox1 = new GroupBox();
-            btnVerCode = new Button();
             panel1 = new Panel();
             nudMinute = new NumericUpDown();
             label2 = new Label();
@@ -53,7 +52,6 @@
             // 
             // groupBox1
             // 
-            groupBox1.Controls.Add(btnVerCode);
             groupBox1.Controls.Add(panel1);
             groupBox1.Controls.Add(button1);
             groupBox1.Dock = DockStyle.Top;
@@ -63,16 +61,6 @@
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "操作";
-            // 
-            // btnVerCode
-            // 
-            btnVerCode.Location = new Point(93, 22);
-            btnVerCode.Name = "btnVerCode";
-            btnVerCode.Size = new Size(83, 26);
-            btnVerCode.TabIndex = 8;
-            btnVerCode.Text = "执行登录";
-            btnVerCode.UseVisualStyleBackColor = true;
-            btnVerCode.Click += btnVerCode_Click;
             // 
             // panel1
             // 
@@ -208,7 +196,6 @@
             Text = "4K世界签到助手";
             FormClosing += FrmMain_FormClosing;
             Load += FrmMain_Load;
-            Shown += FrmMain_Shown;
             groupBox1.ResumeLayout(false);
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
@@ -234,6 +221,5 @@
         private NumericUpDown nudHour;
         private NumericUpDown nudMinute;
         private Label label2;
-        private Button btnVerCode;
     }
 }

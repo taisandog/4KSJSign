@@ -67,6 +67,7 @@ namespace _4KSJSign
             DateTime dtTick = DateTime.MinValue;
             int hour = (int)nudHour.Value;
             int minute = (int)nudMinute.Value;
+            Thread.Sleep(5000);
             while (_running)
             {
                 try
@@ -76,6 +77,7 @@ namespace _4KSJSign
                     {
                         continue;
                     }
+                   
                     if (DoSign(now, dtLast, hour, minute))
                     {
                         dtLast = now;
@@ -111,6 +113,10 @@ namespace _4KSJSign
                 return false;
             }
             if (now.Minute < minute || now.Minute > minute + 5)
+            {
+                return false;
+            }
+            if (!DoLogin(_curUser.Name, _curUser.Password))
             {
                 return false;
             }
@@ -313,23 +319,7 @@ namespace _4KSJSign
                 this.Text = String.Format("4K世界签到助手:[v{0}]", ver.ToString());
             }
 
-            string path = Application.StartupPath.TrimEnd('\\');
-            bool hasSpace = path.Contains(' ');
-
-            StringBuilder sbRoot = new StringBuilder();
-            if (hasSpace)
-            {
-                sbRoot.Append("\"");
-            }
-            sbRoot.Append(path);
-            sbRoot.Append("\\4KSJSign.exe");
-            if (hasSpace)
-            {
-                sbRoot.Append("\"");
-            }
-            sbRoot.Append(" -auto");
-            //_regConfig = new RegConfig(sbRoot.ToString(), "4KSJSign");
-            //chkAutoRun.Checked = _regConfig.IsAutoRun;
+            
             List<UserInfo> lstUser = UserInfo.LoadConfig();
             if (lstUser.Count > 0)
             {
@@ -346,6 +336,7 @@ namespace _4KSJSign
             if (Program.IsAuto)
             {
                 btnStart_Click(btnStart, new EventArgs());
+                
             }
             else
             {
@@ -382,8 +373,14 @@ namespace _4KSJSign
             return true;
         }
 
+        private bool _hasLogin = false;
         private bool DoLogin(string name, string password)
         {
+           
+            if (_hasLogin) 
+            {
+                return true ;
+            }
 
             LoadUrlHtml("https://www.4ksj.com/member.php?mod=logging&action=login");
             Thread.Sleep(500);
@@ -394,32 +391,18 @@ namespace _4KSJSign
 
             sbScript.AppendLine("document.getElementsByName (\"loginsubmit\")[0].click();");
             //string script = "$(\"username_LOsCc\").val(\"taisandog\")";
-            return EvaluateJavaScript(sbScript.ToString());
-
+            _hasLogin= EvaluateJavaScript(sbScript.ToString());
+            return _hasLogin;
         }
         private void FrmMain_Shown(object sender, EventArgs e)
         {
-            //LoadUrlHtml("https://www.4ksj.com/");
+           
 
         }
 
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             StopThread();
-        }
-
-        private void btnVerCode_Click(object sender, EventArgs e)
-        {
-            //_autoEvent.Set();
-
-            if (_curUser == null)
-            {
-                mbDisplay.LogError("没有设置预登录，请自己登录");
-                return;
-            }
-            DoLogin(_curUser.Name, _curUser.Password);
-
-
         }
     }
 }
