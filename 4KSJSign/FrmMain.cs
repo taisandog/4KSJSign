@@ -132,8 +132,9 @@ namespace _4KSJSign
                
                 mbDisplay.Log(" 签到完毕");
 
-                button1_Click(button1, new EventArgs());
-                
+                //button1_Click(button1, new EventArgs());
+                wbMain.Load("about:blank");
+
             }
             catch (Exception ex)
             {
@@ -208,18 +209,25 @@ namespace _4KSJSign
             {
                 return false;
             }
-            HtmlAttribute attr = node.Attributes["href"];
-            if (attr == null) 
+            return ClickSign();
+           
+
+        }
+
+        private static string _signJS = null;
+
+        private bool ClickSign() 
+        {
+            if (string.IsNullOrEmpty(_signJS))
             {
-                mbDisplay.Log(" 找不到签到链接");
-
-                return false;
+                StringBuilder sbJs = new StringBuilder();
+                sbJs.AppendLine("const link = document.querySelector('a.btna');");
+                sbJs.AppendLine("if (link) {");
+                sbJs.AppendLine("link.click();");
+                sbJs.AppendLine("}");
+                _signJS= sbJs.ToString();
             }
-            string url = "https://www.4ksj.com/"+ attr.Value;
-            //string url = "https://www.4ksj.com/qiandao.php?sign=" + hash;
-            html = LoadUrlHtml(url);
-            return true;
-
+            return EvaluateJavaScript(_signJS);
         }
 
         private bool LoadVisted(HtmlAgilityPack.HtmlDocument doc, out HtmlNode signnode)

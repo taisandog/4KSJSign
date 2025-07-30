@@ -1,3 +1,7 @@
+using CefSharp.WinForms;
+using CefSharp;
+using Buffalo.Kernel;
+
 namespace _4KSJSign
 {
     internal static class Program
@@ -16,9 +20,23 @@ namespace _4KSJSign
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             IsAuto = LoadAuto(args);
+            InitializeCefSharp();
             Application.Run(new FrmMain());
         }
+        private static void InitializeCefSharp()
+        {
+            // 创建 CefSettings 对象
+            var settings = new CefSettings();
 
+            // 设置缓存目录。
+            // 你可以使用 Environment.GetFolderPath 获取特殊文件夹，或者直接指定一个路径。
+            // 例如，将其设置为应用程序数据目录下的一个子文件夹：
+           
+            settings.CachePath = CommonMethods.GetBaseRoot("webCache"); ;
+            
+                Cef.Initialize(settings);
+            
+        }
         /// <summary>
         /// 命令行网络唤醒功能
         /// </summary>
